@@ -1,0 +1,42 @@
+services:
+
+  worker1:
+    build: ./worker
+    container_name: worker1
+    networks:
+      - rede-distribuida
+    restart: unless-stopped
+
+  worker2:
+    build: ./worker
+    container_name: worker2
+    networks:
+      - rede-distribuida
+    restart: unless-stopped
+  
+  worker3:
+    build: ./worker
+    container_name: worker3
+    networks:
+      - rede-distribuida
+    restart: unless-stopped
+
+  loadbalancer:
+    image: nginx:alpine
+    container_name: loadbalancer
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - rede-distribuida
+    depends_on:
+      - worker1
+      - worker2
+      - worker3
+    restart: unless-stopped
+
+networks:
+  rede-distribuida:
+    driver: bridge
+
